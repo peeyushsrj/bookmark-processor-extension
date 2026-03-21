@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Bookmark Manager",
+    "version": "1.0",
+    "description": "An extension to display and manage bookmarks.",
+    "permissions": ["bookmarks", "tabs"],
+    "action": {
+      "default_title": "Bookmark Manager",
+      "default_icon": {
+        "16": "icons/16.png",
+        "48": "icons/48.png",
+        "128": "icons/256.png"
+      }
+    },
+    "chrome_url_overrides": {
+      "newtab": "bookmark_manager.html"
+    }
+  }
+  
