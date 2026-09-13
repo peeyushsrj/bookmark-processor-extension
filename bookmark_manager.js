@@ -35,23 +35,45 @@ $(document).ready(function () {
       $('#progress-percentage').text(progressPercentage + '%');
       $('#bookmark-progress').text(`Bookmark ${currentIndex + 1} of ${bookmarks.length}`);
       $('#bookmark-title').text(bookmark.title || 'No Title');
-      $('#bookmark-url').text(bookmark.url);
+      $('#bookmark-link').attr('href', bookmark.url).text(bookmark.url);
+      $('#keep-button').prop('disabled', false);
+      $('#delete-button').prop('disabled', false);
     } else {
       // No more bookmarks
       $('#progress-bar').css('width', '100%');
       $('#progress-percentage').text('100%');
       $('#bookmark-progress').text('');
       $('#bookmark-title').text('No more bookmarks.');
-      $('#bookmark-url').text('');
+      $('#bookmark-link').attr('href', '#').text('');
       $('#keep-button').prop('disabled', true);
       $('#delete-button').prop('disabled', true);
+    }
+    $('#previous-button').prop('disabled', currentIndex === 0);
+  }
+
+  // Extract domain from a bookmark URL for sorting/grouping
+  function getDomain(url) {
+    try {
+      return new URL(url).hostname;
+    } catch (e) {
+      return '';
     }
   }
 
   // Fetch bookmarks and initialize the carousel
   chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
     collectBookmarks(bookmarkTreeNodes);
+    bookmarks.sort((a, b) => getDomain(a.url).localeCompare(getDomain(b.url)));
     displayCurrentBookmark();
+  });
+
+  // "Previous" button click handler
+  $('#previous-button').click(function () {
+    if (currentIndex > 0) {
+      currentIndex--;
+      saveState();
+      displayCurrentBookmark();
+    }
   });
 
   // "Keep" button click handler
@@ -77,6 +99,10 @@ $(document).ready(function () {
 
   // Keyboard shortcuts
   $(document).keydown(function (e) {
+    if (e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'P') {
+      $('#previous-button').click();
+      return;
+    }
     if ($('#keep-button').prop('disabled')) {
       return;
     }
